@@ -1,11 +1,15 @@
+import 'package:blog_app/core/common/utils/snackbar.dart';
+import 'package:blog_app/core/common/widget/loader.dart';
 import 'package:blog_app/core/theme/app_pallete.dart';
+import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_button_gradient.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SigninPage extends StatefulWidget {
-  static route()=> MaterialPageRoute(builder: (context)=>SignupPage());
+  static route() => MaterialPageRoute(builder: (context) => SignupPage());
   const SigninPage({super.key});
 
   @override
@@ -26,57 +30,87 @@ class _SigninPageState extends State<SigninPage> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body:
-         Padding(
-           padding: const EdgeInsets.all(15),
-           child: Form(
-            key: formKey,
-             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text("Sign in",style: TextStyle(
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold
-                  ),),
-                ),
-                const SizedBox(height: 30),
-                AuthField(hintText: "Email",controller: emailController),
-                const SizedBox(height: 15),
-                AuthField(hintText: "password",controller: passwordController,isObsecure: true),
-                SizedBox(height: 20),
-                AuthButtonGradient(btnText: "sign in",),
-                SizedBox(height: 20),
-                GestureDetector(
-                  onTap:(){
-                    Navigator.push(context, SigninPage.route());
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Don't have an account? ",
-                      style:Theme.of(context).textTheme.titleMedium  ,   //default styling of flutter we used here ,
-                      children: [
-                        TextSpan(
-                          text:"Sign up",
-                          style: Theme.of(context).textTheme.titleMedium ?.copyWith(   //this copy width is used to copy the previous style and add some more to it
-                            color: AppPallete.gradient2,
-                            fontWeight: FontWeight.bold
-                               
-                          )
-                        )
-                      ]
-                    )
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthError) {
+              snackBarMessage(context, state.errorMessage);
+            }
+          },
+          builder: (context, state) {
+            if (state is AuthLoading) {
+              return Loader();
+            }
+            return Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Text(
+                      "Sign in",
+                      style: TextStyle(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                )
-             
-             
-              ],
-                     ),
-           ),
-         ),
-      
+                  ),
+                  const SizedBox(height: 30),
+                  AuthField(hintText: "Email", controller: emailController),
+                  const SizedBox(height: 15),
+                  AuthField(
+                    hintText: "password",
+                    controller: passwordController,
+                    isObsecure: true,
+                  ),
+                  SizedBox(height: 20),
+                  AuthButtonGradient(
+                    btnText: "sign in",
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        context.read<AuthBloc>().add(
+                          SignInAuthEvent(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, SigninPage.route());
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don't have an account? ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium, //default styling of flutter we used here ,
+                        children: [
+                          TextSpan(
+                            text: "Sign up",
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  //this copy width is used to copy the previous style and add some more to it
+                                  color: AppPallete.gradient2,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

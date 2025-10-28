@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 
 class AuthButtonGradient extends StatelessWidget {
   final String btnText;
+  final VoidCallback onPressed;
   const AuthButtonGradient({
     super.key,
-    required this.btnText
+    required this.btnText,
+    required this.onPressed
     });
 
   @override
@@ -23,7 +25,7 @@ class AuthButtonGradient extends StatelessWidget {
         borderRadius: BorderRadius.circular(10)
       ),
       child: ElevatedButton(      //this widget don't gives an option for gradient color hence we use or this with "Container"
-        onPressed: () {}, 
+        onPressed: onPressed, 
         style: ElevatedButton.styleFrom(
           fixedSize: Size(385,55),
           backgroundColor: Colors.transparent,
