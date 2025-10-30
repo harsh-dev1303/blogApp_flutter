@@ -18,6 +18,12 @@ class AppTheme{
       contentPadding: const EdgeInsets.all(27),
       enabledBorder: _border(),
       focusedBorder: _border(AppPallete.gradient2 ),
+    ),
+    chipTheme: ChipThemeData(
+      color:WidgetStatePropertyAll(
+        AppPallete.backgroundColor
+      ),
+      side: BorderSide.none
     )
   );
 }
